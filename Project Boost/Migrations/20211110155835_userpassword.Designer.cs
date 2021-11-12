@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectBoost.Context;
 
 namespace ProjectBoost.Migrations
 {
     [DbContext(typeof(ProjectBoostContext))]
-    partial class ProjectBoostContextModelSnapshot : ModelSnapshot
+    [Migration("20211110155835_userpassword")]
+    partial class userpassword
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,7 +109,13 @@ namespace ProjectBoost.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Nickname")
+                    b.Property<string>("FirstName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MiddleName")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("OpenFinantialHistory")

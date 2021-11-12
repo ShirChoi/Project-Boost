@@ -9,11 +9,11 @@ namespace ProjectBoost.Models {
     public class User {
         [Key]
         public int ID { get; set; }//TODO поменять с int на Guid
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
+        public string Nickname { get; set; }
+        public string Password { get; set; }
         public char Type { get; set; } //  c - client, a - admin
         public new UserType GetType => Type == 'c' ? UserType.Client : UserType.Admin;
+        public void SetType(UserType newType) => Type = (newType == UserType.Client ? 'c' : 'a');
         public bool OpenFinantialHistory { get; set; }
         public bool Restricted { get; set; }
 
