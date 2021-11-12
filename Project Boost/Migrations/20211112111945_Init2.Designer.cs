@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectBoost.Context;
 
 namespace ProjectBoost.Migrations
 {
     [DbContext(typeof(ProjectBoostContext))]
-    partial class ProjectBoostContextModelSnapshot : ModelSnapshot
+    [Migration("20211112111945_Init2")]
+    partial class Init2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

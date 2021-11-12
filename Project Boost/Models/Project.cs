@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace ProjectBoost.Models {
     public class Project {
         [Key]
-        public int ID { get; set; } //TODO поменять с int на Guid
+        public Guid ID { get; set; } 
         [ForeignKey("User")]
-        public int UserID { get; set; }
+        public Guid UserID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Demo { get; set; } //TODO поменять со string на File

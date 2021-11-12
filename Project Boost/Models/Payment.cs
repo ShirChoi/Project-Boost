@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 namespace ProjectBoost.Models {
     public class Payment {
         [Key]
-        public int ID { get; set; }//TODO поменять с int на Guid
+        public Guid ID { get; set; }
         [ForeignKey("User")]
-        public int UserID { get; set; }
+        public Guid UserID { get; set; }
         [ForeignKey("Project")]
-        public int ProjectID { get; set; }
+        public Guid ProjectID { get; set; }
         public decimal Amount { get; set; }
 
         //внешние штуки 
