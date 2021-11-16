@@ -9,6 +9,9 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<p>
+    @User.Identity.IsAuthenticated
+</p>
 <table class="table">
     <thead>
         <tr>
@@ -25,23 +28,43 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nickname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OpenFinantialHistory)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Restricted)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
+        @if(User.Identity == null) {
+            @foreach(var item in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nickname)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OpenFinantialHistory)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Restricted)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    </td>
+                </tr>
+            }
+        } else {
+            User item = Model.Where(user => user.ID.ToString() == User.Identity.Name).First();
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nickname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OpenFinantialHistory)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Restricted)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectBoost.Context;
 using ProjectBoost.Models;
 using ProjectBoost.Models.ViewModels.UserModels;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace ProjectBoost.Controllers {
     public class UsersController : Controller {
@@ -19,7 +24,11 @@ namespace ProjectBoost.Controllers {
 
         // GET: Users
         public async Task<IActionResult> Index() {
-            return View(await _context.Users.ToListAsync());
+            //UserManager;
+            if(User.Identity.IsAuthenticated)
+                return View(await _context.Users.ToListAsync());
+
+            return RedirectToAction("Login");
         }
 
         // GET: Users/Details/5
@@ -38,15 +47,15 @@ namespace ProjectBoost.Controllers {
                 Nickname = user.Nickname,
                 OpenFinantialHistory = user.OpenFinantialHistory,
                 Restricted = user.Restricted,
-                TypeAccessor = user.GetType(),
+                RoleID = user.RoleID
             };
 
             return View(viewModel);
         }
 
         // GET: Users/Create
-        public IActionResult Create() {
-            return View();
+        public async Task<IActionResult> Create() {
+            return await Task.FromResult(View());
         }
 
         // POST: Users/Create
@@ -59,15 +68,39 @@ namespace ProjectBoost.Controllers {
                 return View(user);
             User dbUser = new User() {
                 ID = Guid.NewGuid(),
+                RoleID = 2,
                 Nickname = user.Nickname,
                 Password = user.Password,
                 OpenFinantialHistory = user.OpenFinantialHistory,
                 Restricted = false
             };
-            dbUser.SetType(UserType.Client);
             _context.Add(dbUser);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Login() {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([Bind("Nickname,Password")] UserLoginModel user) {
+            if(!ModelState.IsValid)
+                return View(user);
+
+            var users = (await _context.Users.Where(_user =>
+                _user.Nickname == user.Nickname &&
+                _user.Password == user.Password
+            ).ToArrayAsync());
+
+            if(users.Length == 0) {
+                ViewBag.ErrorMessage = "Некорректные логин и(или) пароль";
+                return View(user);
+            }
+
+            var dbUser = users.First();
+            await Authenticate(dbUser);
+            return RedirectToAction("Index");
         }
 
         // GET: Users/Edit/5
@@ -107,7 +140,6 @@ namespace ProjectBoost.Controllers {
                 Restricted = user.Restricted,
                 OpenFinantialHistory = user.OpenFinantialHistory
             };
-            dbUser.SetType(UserType.Client);
            
 
             if (ModelState.IsValid) {
@@ -153,6 +185,23 @@ namespace ProjectBoost.Controllers {
 
         private bool UserExists(Guid id) {
             return _context.Users.Any(e => e.ID == id);
+        }
+        private async Task Authenticate(User user) {
+            // создаем один claim
+            var claims = new List<Claim> {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.ID.ToString()),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
+            };
+            // создаем объект ClaimsIdentity
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            // установка аутентификационных куки
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+
+        public async Task<IActionResult> Logout() {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return RedirectToAction(controllerName: "Home", actionName: "Index");
         }
     }
 }

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectBoost.Context;
 
 namespace ProjectBoost.Migrations
 {
     [DbContext(typeof(ProjectBoostContext))]
-    partial class ProjectBoostContextModelSnapshot : ModelSnapshot
+    [Migration("20211116061930_Init3")]
+    partial class Init3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,7 +105,7 @@ namespace ProjectBoost.Migrations
 
             modelBuilder.Entity("ProjectBoost.Models.Role", b =>
                 {
-                    b.Property<int?>("ID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -112,19 +114,7 @@ namespace ProjectBoost.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            ID = 1,
-                            Name = "admin"
-                        },
-                        new
-                        {
-                            ID = 2,
-                            Name = "user"
-                        });
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("ProjectBoost.Models.User", b =>
@@ -153,17 +143,6 @@ namespace ProjectBoost.Migrations
                     b.HasIndex("RoleID");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            ID = new Guid("dd68a389-4ad1-4e39-999c-d51edad34ef4"),
-                            Nickname = "admin@mail.ru",
-                            OpenFinantialHistory = false,
-                            Password = "123456",
-                            Restricted = false,
-                            RoleID = 1
-                        });
                 });
 
             modelBuilder.Entity("ProjectBoost.Models.Complaint", b =>

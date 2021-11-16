@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Proxies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +29,11 @@ namespace ProjectBoost {
                 option.UseSqlite(Configuration.GetConnectionString("DefaultSQLite"));
             });
 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie(options => {
+                        options.LoginPath = new PathString("/Home");
+                    });
+
             services.AddControllersWithViews();
         }
 
@@ -44,6 +52,7 @@ namespace ProjectBoost {
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllerRoute(
@@ -51,5 +60,6 @@ namespace ProjectBoost {
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+
     }
 }
