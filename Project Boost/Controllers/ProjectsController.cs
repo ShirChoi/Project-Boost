@@ -19,7 +19,7 @@ namespace ProjectBoost.Controllers {
         }
 
         // GET: Projects
-        [Authorize(Roles = "")]
+        [Authorize(Roles = "user")]
         public async Task<IActionResult> Index() {
             var projectBoostContext = _context.Projects.Include(p => p.User);
             return View(await projectBoostContext.ToListAsync());

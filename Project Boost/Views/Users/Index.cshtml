@@ -9,9 +9,6 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<p>
-    @User.Identity.IsAuthenticated
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -28,7 +25,7 @@
         </tr>
     </thead>
     <tbody>
-        @if(User.Identity == null) {
+        @if(User.IsInRole("admin")) {
             @foreach(var item in Model) {
                 <tr>
                     <td>
@@ -48,7 +45,7 @@
                 </tr>
             }
         } else {
-            User item = Model.Where(user => user.ID.ToString() == User.Identity.Name).First();
+            User item = Model.Where(user => user.Nickname == User.Identity.Name).First();
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Nickname)

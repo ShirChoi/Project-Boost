@@ -135,6 +135,7 @@ namespace ProjectBoost.Controllers {
 
             User dbUser = new User() {
                 ID = user.ID,
+                RoleID = 2,
                 Nickname = user.Nickname,
                 Password = user.Password,
                 Restricted = user.Restricted,
@@ -189,8 +190,9 @@ namespace ProjectBoost.Controllers {
         private async Task Authenticate(User user) {
             // создаем один claim
             var claims = new List<Claim> {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.ID.ToString()),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Nickname),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role.Name),
+                new Claim("ID", user.ID.ToString())
             };
             // создаем объект ClaimsIdentity
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
