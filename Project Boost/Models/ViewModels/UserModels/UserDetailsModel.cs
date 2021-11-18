@@ -16,5 +16,7 @@ namespace ProjectBoost.Models.ViewModels.UserModels {
 
         [Display(Name = "Ограничен")]
         public bool Restricted { get; set; }
+
+        public ICollection<Project> Projects { get; set; }
     }
 }

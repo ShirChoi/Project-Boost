@@ -47,7 +47,8 @@ namespace ProjectBoost.Controllers {
                 Nickname = user.Nickname,
                 OpenFinantialHistory = user.OpenFinantialHistory,
                 Restricted = user.Restricted,
-                RoleID = user.RoleID
+                RoleID = user.RoleID,
+                Projects = user.Projects
             };
 
             return View(viewModel);

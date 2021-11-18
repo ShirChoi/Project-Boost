@@ -19,7 +19,6 @@ namespace ProjectBoost.Controllers {
         }
 
         // GET: Projects
-        [Authorize(Roles = "user")]
         public async Task<IActionResult> Index() {
             var projectBoostContext = _context.Projects.Include(p => p.User);
             return View(await projectBoostContext.ToListAsync());
@@ -43,7 +42,6 @@ namespace ProjectBoost.Controllers {
 
         // GET: Projects/Create
         public IActionResult Create() {
-            ViewData["UserNickname"] = new SelectList(_context.Users, "Nickname", "Nickname");
             return View();
         }
 
@@ -52,7 +50,7 @@ namespace ProjectBoost.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserNickname,Name,Description,Demo,RequiredAmount,DeadLine")] ProjectCreateModel project) {
+        public async Task<IActionResult> Create([Bind("Name,Description,Demo,RequiredAmount,DeadLine")] ProjectCreateModel project) {
             Project dbProject = new Project() {
                 ID = Guid.NewGuid(),
                 Name = project.Name,
@@ -62,18 +60,16 @@ namespace ProjectBoost.Controllers {
                 Description = project.Description,
                 ReceivedAmount = 0,
                 RequiredAmount = project.RequiredAmount,
-                UserID = (await _context
-                                .Users.Where(user => user.Nickname == project.UserNickname)
-                                .FirstAsync()).ID
+                UserID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value)
             };
-            
-            if(ModelState.IsValid) {
+            bool valid = ModelState.IsValid; // для дебага
+            { }
+            if(valid) {
                 _context.Add(dbProject);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["UserNickname"] = new SelectList(_context.Users, "Nickname", "Nickname", project.Name);
             return View(project);
         }
 
@@ -86,6 +82,11 @@ namespace ProjectBoost.Controllers {
             var project = await _context.Projects.FindAsync(id);
             if(project == null) 
                 return NotFound();
+
+            if(!await IsAllowedToChange(project.ID.ToString(), 
+                User.FindFirst(claim => claim.Type == "ID").Value)) 
+                return Unauthorized();
+            
 
             ProjectEditModel viewModel = new ProjectEditModel() {
                 ID = project.ID,
@@ -119,6 +120,10 @@ namespace ProjectBoost.Controllers {
             dbProject.Demo              = project.Demo;
             dbProject.Description       = project.Description;
 
+            if(!await IsAllowedToChange(id.ToString(),
+                User.FindFirst(claim => claim.Type == "ID").Value))
+                return Unauthorized();
+            
             try {
                 _context.Update(dbProject);
                 await _context.SaveChangesAsync();
@@ -138,25 +143,46 @@ namespace ProjectBoost.Controllers {
             var project = await _context.Projects
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.ID == id);
+
             if(project == null) {
                 return NotFound();
             }
 
+            if(!await IsAllowedToChange(project.ID.ToString(),
+                User.FindFirst(claim => claim.Type == "ID").Value))
+                return Unauthorized();
+
             return View(project);
         }
+        
+       
 
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id) {
             var project = await _context.Projects.FindAsync(id);
+
+            if(!await IsAllowedToChange(project.ID.ToString(),
+                User.FindFirst(claim => claim.Type == "ID").Value))
+                return Unauthorized();
+
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        [NonAction]
         private bool ProjectExists(Guid id) {
             return _context.Projects.Any(e => e.ID == id);
+        }
+        [NonAction]
+        private async Task<bool> IsAllowedToChange(string projectID, string userID) {
+            Project proj = await _context.Projects.FindAsync(Guid.Parse(projectID));
+
+            if(proj == null)
+                throw new Exception("Project not found");
+
+            return proj.UserID.ToString() == userID || User.IsInRole("admin");
         }
     }
 }

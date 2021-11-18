@@ -50,9 +50,16 @@
                 @Html.DisplayFor(modelItem => item.User.Nickname)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                @{string ID = User.FindFirst(claim => claim.Type == "ID").Value;}
+                @if(ID == item.UserID.ToString()) {
+                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
+                    <lol> | </lol>
+                }
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                @if(ID == item.UserID.ToString()) {
+                    <lol> | </lol>
+                    <a asp-action="Delete" asp-route-id="@item.ID"> Delete</a>
+                }
             </td>
         </tr>
 }

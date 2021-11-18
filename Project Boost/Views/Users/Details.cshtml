@@ -28,6 +28,15 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Restricted)
         </dd>
+        <dt class="col-sm-2">
+            Projects
+        </dt>
+        <dd class="col-sm-10">
+            @foreach(var project in Model.Projects) {
+                <a href="~/Projects/Details/@project.ID.ToString()">@project.Name</a>
+                <br />
+            }
+        </dd>
     </dl>
 </div>
 <div>

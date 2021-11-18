@@ -7,9 +7,6 @@ using System.ComponentModel.DataAnnotations;
 namespace ProjectBoost.Models.ViewModels.ProjectModels {
     public class ProjectCreateModel {
         [Required]
-        [Display(Name = "Создатель")]
-        public string UserNickname { get; set; }
-        [Required]
         [Display(Name = "Имя проекта")]
         public string Name { get; set; }
         [Required]
