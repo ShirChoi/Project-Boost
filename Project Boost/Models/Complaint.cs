@@ -15,7 +15,7 @@ namespace ProjectBoost.Models {
         
         [ForeignKey("Project")] 
         public Guid ProjectID { get; set; }
-        
+        [Required]
         public string Text { get; set; }
 
         //внешние штуки 

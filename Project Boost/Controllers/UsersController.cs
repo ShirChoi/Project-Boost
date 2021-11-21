@@ -245,7 +245,7 @@ namespace ProjectBoost.Controllers {
         [ActionName("Complain")]
         public async Task<IActionResult> Complain(Guid projectID) {
             if(!User.Identity.IsAuthenticated)
-                return RedirectToAction(controllerName: "Projects", actionName: "Index");
+                return RedirectToAction(controllerName: "Users", actionName: "Login");
             if(User.IsInRole("admin"))
                 return RedirectToAction(controllerName: "Home", actionName: "Index");
 
@@ -253,7 +253,7 @@ namespace ProjectBoost.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> Complain(Guid projectID, [Bind("Amount")] Complaint complaint) {
+        public async Task<IActionResult> Complain(Guid projectID, [Bind("Text")] Complaint complaint) {
             //string text = RouteData.Values["Donate/"].ToString();
             var arrObj = Request.RouteValues.ToArray().Select(a => a.Value).ToArray();
             string[] arr = new string[arrObj.Length];
@@ -266,7 +266,7 @@ namespace ProjectBoost.Controllers {
                 return NotFound();
 
             if(!ModelState.IsValid)
-                return View(payment);
+                return View(complaint);
 
             if(!User.Identity.IsAuthenticated)
                 return RedirectToAction(controllerName: "Projects", actionName: "Details", routeValues: new { ID = projectID });
@@ -279,19 +279,16 @@ namespace ProjectBoost.Controllers {
 
             if(project == null)
                 return NotFound();
-            payment.ID = Guid.NewGuid();
-            payment.ProjectID = projectID;
-            payment.UserID = userID;
-            project.ReceivedAmount += payment.Amount;
 
-            _context.Add(payment);
-            _context.Update(project);
+            complaint.ID = Guid.NewGuid();
+            complaint.ProjectID = projectID;
+            complaint.UserID = userID;
+
+            _context.Add(complaint);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
-
-
 
         [NonAction]
         private bool UserExists(Guid id) {
