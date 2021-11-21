@@ -50,7 +50,7 @@
                 @Html.DisplayFor(modelItem => item.User.Nickname)
             </td>
             <td>
-                @{string ID = User.FindFirst(claim => claim.Type == "ID").Value;}
+                @{string ID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
                 @if(ID == item.UserID.ToString()) {
                     <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
                     <lol> | </lol>

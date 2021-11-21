@@ -37,6 +37,16 @@
                 <br />
             }
         </dd>
+        <dt class="col-sm-2">
+            Donations
+        </dt>
+        <dd class="col-sm-10">
+            @foreach(var payment in Model.Payments) {
+                <p>project: @payment.Project.Name</p>
+                <p>amount: @payment.Amount</p>
+                <br />
+            }
+        </dd>
     </dl>
 </div>
 <div>

@@ -55,9 +55,12 @@
     </dl>
 </div>
 <div>
-    @{string ID = User.FindFirst(claim => claim.Type == "ID").Value;}
+    @{string ID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
     @if(ID == Model.UserID.ToString() || User.IsInRole("admin")) {
         <a asp-action="Edit" asp-route-id="@Model.ID">Edit </a>
+    }
+    @if(User.Identity.IsAuthenticated || !User.IsInRole("admin")) {
+        <a asp-controller="Users" asp-action="Donate" asp-route-id="@Model.ID">Donate </a>
     }
     <a asp-action="Index">Back to List</a>
 </div>

@@ -41,8 +41,8 @@ namespace ProjectBoost.Controllers {
         }
 
         // GET: Projects/Create
-        public IActionResult Create() {
-            return View();
+        public async Task<IActionResult> Create() {
+            return await Task.FromResult(View());
         }
 
         // POST: Projects/Create
@@ -62,9 +62,7 @@ namespace ProjectBoost.Controllers {
                 RequiredAmount = project.RequiredAmount,
                 UserID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value)
             };
-            bool valid = ModelState.IsValid; // для дебага
-            { }
-            if(valid) {
+            if(ModelState.IsValid) {
                 _context.Add(dbProject);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -154,8 +152,6 @@ namespace ProjectBoost.Controllers {
 
             return View(project);
         }
-        
-       
 
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]

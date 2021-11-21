@@ -23,6 +23,7 @@ namespace ProjectBoost.Controllers {
         }
 
         // GET: Users
+        [ActionName("Index")]
         public async Task<IActionResult> Index() {
             //UserManager;
             if(User.Identity.IsAuthenticated)
@@ -38,8 +39,8 @@ namespace ProjectBoost.Controllers {
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(m => m.ID == id);
-            
-            if (user == null)
+
+            if(user == null)
                 return NotFound();
 
             UserDetailsModel viewModel = new UserDetailsModel() {
@@ -48,7 +49,8 @@ namespace ProjectBoost.Controllers {
                 OpenFinantialHistory = user.OpenFinantialHistory,
                 Restricted = user.Restricted,
                 RoleID = user.RoleID,
-                Projects = user.Projects
+                Projects = user.Projects,
+                Payments = user.Payments
             };
 
             return View(viewModel);
@@ -81,7 +83,7 @@ namespace ProjectBoost.Controllers {
         }
 
         public async Task<IActionResult> Login() {
-            return View();
+            return await Task.FromResult(View());
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -126,12 +128,10 @@ namespace ProjectBoost.Controllers {
         }
 
         // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("ID,Nickname,Password,OpenFinantialHistory,Restricted")] UserEditModel user) {
-            if (id != user.ID)
+            if(id != user.ID)
                 return NotFound();
 
             User dbUser = new User() {
@@ -142,13 +142,13 @@ namespace ProjectBoost.Controllers {
                 Restricted = user.Restricted,
                 OpenFinantialHistory = user.OpenFinantialHistory
             };
-           
 
-            if (ModelState.IsValid) {
+
+            if(ModelState.IsValid) {
                 try {
                     _context.Update(dbUser);
                     await _context.SaveChangesAsync();
-                } catch (DbUpdateConcurrencyException) {
+                } catch(DbUpdateConcurrencyException) {
                     if(!UserExists(user.ID))
                         return NotFound();
                     else
@@ -163,15 +163,15 @@ namespace ProjectBoost.Controllers {
 
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(Guid? id) {
-            if (id == null) 
+            if(id == null)
                 return NotFound();
-            
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(m => m.ID == id);
-            
-            if (user == null)
+
+            if(user == null)
                 return NotFound();
-            
+
             return View(user);
         }
 
@@ -183,6 +183,51 @@ namespace ProjectBoost.Controllers {
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [ActionName("Donate")]
+        public async Task<IActionResult> Donate(Guid projectID) {
+            if(!User.Identity.IsAuthenticated)
+                return RedirectToAction(controllerName: "Projects", actionName: "Index");
+
+            return await Task.FromResult(View()); 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Donate(Guid projectID, [Bind("Amount")] Payment payment) {
+            //string text = RouteData.Values["Donate/"].ToString();
+            var arrObj = Request.RouteValues.ToArray().Select(a => a.Value).ToArray();
+            string[] arr = new string[arrObj.Length];
+
+            for(int i = 0; i < arrObj.Length; i++)
+                arr[i] = (string)arrObj[i];
+
+            bool parsed = Guid.TryParse(arr[2], out projectID); // простите меня за этот код
+            if(!parsed)
+                return NotFound();
+
+            if(!ModelState.IsValid)
+                return View(payment);
+
+            if(!User.Identity.IsAuthenticated)
+                return RedirectToAction(controllerName: "Projects", actionName: "Details", routeValues: new { ID = projectID });
+
+
+            Project project = await _context.Projects.FindAsync(projectID);
+            Guid userID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value);
+
+            if(project == null)
+                return NotFound();
+            payment.ID = Guid.NewGuid();
+            payment.ProjectID = projectID;
+            payment.UserID = userID;
+            project.ReceivedAmount += payment.Amount;
+
+            _context.Add(payment);
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
         private bool UserExists(Guid id) {

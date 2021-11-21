@@ -18,5 +18,6 @@ namespace ProjectBoost.Models.ViewModels.UserModels {
         public bool Restricted { get; set; }
 
         public ICollection<Project> Projects { get; set; }
+        public ICollection<Payment> Payments { get; set; }
     }
 }
