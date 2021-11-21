@@ -37,19 +37,26 @@
                 <br />
             }
         </dd>
-        <dt class="col-sm-2">
-            Donations
-        </dt>
-        <dd class="col-sm-10">
-            @foreach(var payment in Model.Payments) {
-                <p>project: @payment.Project.Name</p>
-                <p>amount: @payment.Amount</p>
-                <br />
-            }
-        </dd>
+        @{string userID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
+        @if(User.IsInRole("admin") || userID == Model.ID.ToString() || Model.OpenFinantialHistory) {
+            <dt class="col-sm-2">
+                Donations
+            </dt>
+            <dd class="col-sm-10">
+                @foreach(var payment in Model.Payments) {
+                    <p class="form-text">
+                        project: <a asp-action="Details" asp-controller="Projects" asp-route-id="@payment.ProjectID">@payment.Project.Name</a>
+                    </p>
+                    <p class="form-text">amount: @payment.Amount</p>
+                    <br />
+                }
+            </dd>
+        }
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
+    @if(User.IsInRole("admin") || userID == Model.ID.ToString()) {
+        <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> <lol>|</lol>
+    }
     <a asp-action="Index">Back to List</a>
 </div>

@@ -69,6 +69,11 @@ namespace ProjectBoost.Controllers {
         public async Task<IActionResult> Create([Bind("Nickname,Password,OpenFinantialHistory")] UserRegisterModel user) {
             if(!ModelState.IsValid)
                 return View(user);
+           
+            if(_context.Users.Where(_user => _user.Nickname == user.Nickname).Count() == 1) {
+                ViewBag.ErrorMessage = $"Пользователь с именем {user.Nickname} уже существует";
+                return View();
+            }
             User dbUser = new User() {
                 ID = Guid.NewGuid(),
                 RoleID = 2,
@@ -115,6 +120,9 @@ namespace ProjectBoost.Controllers {
 
             if(user == null)
                 return NotFound();
+
+            if(User.FindFirst(claim => claim.Type == "ID").Value != id.ToString())
+                return RedirectToAction("Index", "Home");
 
             UserEditModel viewModel = new UserEditModel() {
                 ID = user.ID,
@@ -189,6 +197,8 @@ namespace ProjectBoost.Controllers {
         public async Task<IActionResult> Donate(Guid projectID) {
             if(!User.Identity.IsAuthenticated)
                 return RedirectToAction(controllerName: "Projects", actionName: "Index");
+            if(User.IsInRole("admin"))
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
 
             return await Task.FromResult(View()); 
         }
@@ -211,6 +221,8 @@ namespace ProjectBoost.Controllers {
 
             if(!User.Identity.IsAuthenticated)
                 return RedirectToAction(controllerName: "Projects", actionName: "Details", routeValues: new { ID = projectID });
+            if(User.IsInRole("admin"))
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
 
 
             Project project = await _context.Projects.FindAsync(projectID);
@@ -230,9 +242,63 @@ namespace ProjectBoost.Controllers {
             return RedirectToAction("Index");
         }
 
+        [ActionName("Complain")]
+        public async Task<IActionResult> Complain(Guid projectID) {
+            if(!User.Identity.IsAuthenticated)
+                return RedirectToAction(controllerName: "Projects", actionName: "Index");
+            if(User.IsInRole("admin"))
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
+
+            return await Task.FromResult(View());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Complain(Guid projectID, [Bind("Amount")] Complaint complaint) {
+            //string text = RouteData.Values["Donate/"].ToString();
+            var arrObj = Request.RouteValues.ToArray().Select(a => a.Value).ToArray();
+            string[] arr = new string[arrObj.Length];
+
+            for(int i = 0; i < arrObj.Length; i++)
+                arr[i] = (string)arrObj[i];
+
+            bool parsed = Guid.TryParse(arr[2], out projectID); // простите меня за этот код
+            if(!parsed)
+                return NotFound();
+
+            if(!ModelState.IsValid)
+                return View(payment);
+
+            if(!User.Identity.IsAuthenticated)
+                return RedirectToAction(controllerName: "Projects", actionName: "Details", routeValues: new { ID = projectID });
+            if(User.IsInRole("admin"))
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
+
+
+            Project project = await _context.Projects.FindAsync(projectID);
+            Guid userID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value);
+
+            if(project == null)
+                return NotFound();
+            payment.ID = Guid.NewGuid();
+            payment.ProjectID = projectID;
+            payment.UserID = userID;
+            project.ReceivedAmount += payment.Amount;
+
+            _context.Add(payment);
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+
+
+        [NonAction]
         private bool UserExists(Guid id) {
             return _context.Users.Any(e => e.ID == id);
         }
+
+        [NonAction]
         private async Task Authenticate(User user) {
             // создаем один claim
             var claims = new List<Claim> {

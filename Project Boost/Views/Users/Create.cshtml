@@ -27,6 +27,9 @@
                     <input class="form-check-input" asp-for="OpenFinantialHistory" /> @Html.DisplayNameFor(model => model.OpenFinantialHistory)
                 </label>
             </div>
+            <div class="text-danger">
+                @ViewBag.ErrorMessage
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

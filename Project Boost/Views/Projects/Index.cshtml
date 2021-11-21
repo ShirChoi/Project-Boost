@@ -6,10 +6,11 @@
 
 
 <h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if(!User.IsInRole("admin")) { 
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -47,7 +48,9 @@
                 @Html.DisplayFor(modelItem => item.DeadLine)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.User.Nickname)
+                <a asp-controller="Users" asp-action="Details" asp-route-id="@item.User.ID">
+                    @Html.DisplayFor(modelItem => item.User.Nickname)
+                </a>
             </td>
             <td>
                 @{string ID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
@@ -56,10 +59,10 @@
                     <lol> | </lol>
                 }
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a>
-                @if(ID == item.UserID.ToString()) {
+                @*@if(ID == item.UserID.ToString()) {
                     <lol> | </lol>
                     <a asp-action="Delete" asp-route-id="@item.ID"> Delete</a>
-                }
+                }*@
             </td>
         </tr>
 }

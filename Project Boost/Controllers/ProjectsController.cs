@@ -42,6 +42,8 @@ namespace ProjectBoost.Controllers {
 
         // GET: Projects/Create
         public async Task<IActionResult> Create() {
+            if(User.IsInRole("admin"))
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
             return await Task.FromResult(View());
         }
 
@@ -51,6 +53,8 @@ namespace ProjectBoost.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Demo,RequiredAmount,DeadLine")] ProjectCreateModel project) {
+            if(User.IsInRole("admin"))
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
             Project dbProject = new Project() {
                 ID = Guid.NewGuid(),
                 Name = project.Name,
