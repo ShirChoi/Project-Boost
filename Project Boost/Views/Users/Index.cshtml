@@ -4,22 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Пользователи</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Nickname)
+                Имя
+            </th>
+            <th>=
+                Публичная история платежей
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OpenFinantialHistory)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Restricted)
+                Ограничен
             </th>
             <th></th>
         </tr>
@@ -57,9 +54,9 @@
                     @Html.DisplayFor(modelItem => item.Restricted)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
-                    | <a asp-action="Details" asp-route-id="@item.ID">Details</a>
-                    | <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Редактировать</a>
+                    | <a asp-action="Details" asp-route-id="@item.ID">Данные</a>
+                    | @*<a asp-action="Delete" asp-route-id="@item.ID">Удалить</a>*@
                 </td>
             </tr>
         }

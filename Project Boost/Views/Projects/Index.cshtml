@@ -5,29 +5,29 @@
 }
 
 
-<h1>Index</h1>
+<h1>Проекты</h1>
 @if(!User.IsInRole("admin")) { 
     <p>
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Создать новый проект</a>
     </p>
 }
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Название 
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RequiredAmount)
+                Необходимая сумма
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ReceivedAmount)
+                Полученная сумма
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DeadLine)
+                Крайний срок
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.User)
+                Создатель
             </th>
             <th></th>
         </tr>
@@ -55,10 +55,10 @@
             <td>
                 @{string ID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
                 @if(ID == item.UserID.ToString()) {
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Редактировать</a>
                     <lol> | </lol>
                 }
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                <a asp-action="Details" asp-route-id="@item.ID">Подробнее</a>
                 @*@if(ID == item.UserID.ToString()) {
                     <lol> | </lol>
                     <a asp-action="Delete" asp-route-id="@item.ID"> Delete</a>

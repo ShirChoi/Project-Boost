@@ -4,50 +4,49 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>Детали проекта</h1>
 
 <div>
-    <h4>Project</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            Назвние
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            Описание
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Demo)
+            Демо
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Demo)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.RequiredAmount)
+            Необходимая сумма
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.RequiredAmount)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ReceivedAmount)
+            Полученная сумма
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ReceivedAmount)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DeadLine)
+            Крайний срок
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DeadLine)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
+            Создатель
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.User.Nickname)
@@ -55,24 +54,24 @@
         @{string userID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
         @if(Model.User.ID.ToString() == userID || User.IsInRole("admin")) {
             <dt class="col-sm-2">
-                Donations
+                Пожертвования
             </dt>
             <dd class="col-sm-10">
                 @foreach(var payment in Model.Payments) {
                     <p class="form-text">
-                        from user: <a asp-action="Details" asp-controller="Users" asp-route-id="@payment.UserID">@payment.User.Nickname</a>
+                        от пользователя: <a asp-action="Details" asp-controller="Users" asp-route-id="@payment.UserID">@payment.User.Nickname</a>
                     </p>
-                    <p class="form-text">amount: @payment.Amount</p>
+                    <p class="form-text">количество: @payment.Amount</p>
                     <br />
                 }
             </dd>
             <dt class="col-sm-2">
-                Complaints
+                Жалобы
             </dt>
             <dd class="col-sm-10">
                 @foreach(var complaint in Model.Complaints) {
                     <p class="form-text">
-                        from user: <a asp-action="Details" asp-controller="Users" asp-route-id="@complaint.UserID">from @complaint.User.Nickname</a>
+                        от пользователя: <a asp-action="Details" asp-controller="Users" asp-route-id="@complaint.UserID">from @complaint.User.Nickname</a>
                     </p>
                     <p class="form-text">@complaint.Text</p>
                     <br />
@@ -85,16 +84,16 @@
 <div>
     @{string ID = User.FindFirst(claim => claim.Type == "ID")?.Value;}
     @if(User.Identity.IsAuthenticated && !User.IsInRole("admin")) {
-        <a asp-controller="Users" asp-action="Donate" asp-route-id="@Model.ID">Donate</a>
+        <a asp-controller="Users" asp-action="Donate" asp-route-id="@Model.ID">Пожертвовать</a>
         <br />
     }
     @if(User.Identity.IsAuthenticated && ID != Model.UserID.ToString()) {
-        <a asp-controller="Users" asp-action="Complain" asp-route-id="@Model.ID">Complain</a>
+        <a asp-controller="Users" asp-action="Complain" asp-route-id="@Model.ID">Пожаловаться</a>
         <br />
     }
     @if(ID == Model.UserID.ToString() || User.IsInRole("admin")) {
-        <a asp-action="Edit" asp-route-id="@Model.ID">Edit </a>
+        <a asp-action="Edit" asp-route-id="@Model.ID">Редактировать </a>
         <br />
     }
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">К списку проектов</a>
 </div>
