@@ -42,6 +42,14 @@ namespace ProjectBoost.Controllers {
 
         // GET: Projects/Create
         public async Task<IActionResult> Create() {
+            Guid userID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value);
+            User user = _context.Users.Find(userID);
+
+            if(user == null)
+                throw new Exception();
+
+            if(user.Restricted)
+                return RedirectToAction(controllerName: "Projects", actionName: "Index");
             if(User.IsInRole("admin"))
                 return RedirectToAction(controllerName: "Home", actionName: "Index");
             return await Task.FromResult(View());
@@ -55,6 +63,8 @@ namespace ProjectBoost.Controllers {
         public async Task<IActionResult> Create([Bind("Name,Description,Demo,RequiredAmount,DeadLine")] ProjectCreateModel project) {
             if(User.IsInRole("admin"))
                 return RedirectToAction(controllerName: "Home", actionName: "Index");
+            Guid userID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value);
+
             Project dbProject = new Project() {
                 ID = Guid.NewGuid(),
                 Name = project.Name,
@@ -64,7 +74,7 @@ namespace ProjectBoost.Controllers {
                 Description = project.Description,
                 ReceivedAmount = 0,
                 RequiredAmount = project.RequiredAmount,
-                UserID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value)
+                UserID = userID
             };
             if(ModelState.IsValid) {
                 _context.Add(dbProject);

@@ -10,10 +10,10 @@ namespace ProjectBoost.Models.ViewModels.UserModels {
         public Guid ID { get; set; }
         [Required(ErrorMessage = "Логин не может быть пустым")]
         [Display(Name = "новый Логин")]
-        public string Nickname { get; set; }
+        public string Nickname { get; set; } = "trash2";
         [Required(ErrorMessage = "Пароль не может быть пустым")]
         [Display(Name = "новый Пароль")]
-        public string Password { get; set; }
+        public string Password { get; set; } = "trash2";
 
         [Display(Name = "Ограничен")]
         public bool Restricted { get; set; } = false;

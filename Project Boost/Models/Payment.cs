@@ -14,7 +14,7 @@ namespace ProjectBoost.Models {
         [ForeignKey("Project")]
         public Guid ProjectID { get; set; }
         [Required]
-        public decimal Amount { get; set; }//TODO сделать так, чтобы нельзя было давать отрицательное кол-во денег
+        public decimal Amount { get; set; }
 
         //внешние штуки 
         public virtual User User { get; set; }

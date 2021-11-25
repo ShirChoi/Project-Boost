@@ -121,13 +121,13 @@ namespace ProjectBoost.Controllers {
             if(user == null)
                 return NotFound();
 
-            if(User.FindFirst(claim => claim.Type == "ID").Value != id.ToString())
+            if(User.FindFirst(claim => claim.Type == "ID").Value != id.ToString() && !User.IsInRole("admin"))
                 return RedirectToAction("Index", "Home");
 
             UserEditModel viewModel = new UserEditModel() {
                 ID = user.ID,
                 Nickname = user.Nickname,
-                Password = "",
+                Password = "__no__",
                 OpenFinantialHistory = user.OpenFinantialHistory,
                 Restricted = user.Restricted,
             };
@@ -142,15 +142,25 @@ namespace ProjectBoost.Controllers {
             if(id != user.ID)
                 return NotFound();
 
-            User dbUser = new User() {
-                ID = user.ID,
-                RoleID = 2,
-                Nickname = user.Nickname,
-                Password = user.Password,
-                Restricted = user.Restricted,
-                OpenFinantialHistory = user.OpenFinantialHistory
-            };
 
+
+            //User dbUser = new User() {
+            //    ID = user.ID,
+            //    RoleID = 2,
+            //    Nickname = user.Nickname,
+            //    Password = user.Password,
+            //    Restricted = user.Restricted,
+            //    OpenFinantialHistory = user.OpenFinantialHistory
+            //};
+
+            User dbUser = _context.Users.Find(id);
+            if(user.Restricted != dbUser.Restricted)
+                dbUser.Restricted = user.Restricted;
+            else {
+                dbUser.Nickname = user.Nickname;
+                dbUser.Password = user.Password;
+                dbUser.OpenFinantialHistory = user.OpenFinantialHistory;
+            }
 
             if(ModelState.IsValid) {
                 try {
@@ -206,6 +216,8 @@ namespace ProjectBoost.Controllers {
         [HttpPost]
         public async Task<IActionResult> Donate(Guid projectID, [Bind("Amount")] Payment payment) {
             //string text = RouteData.Values["Donate/"].ToString();
+            if(payment.Amount <= 0)
+                return RedirectToAction(controllerName: "Projects", actionName: "Index");
             var arrObj = Request.RouteValues.ToArray().Select(a => a.Value).ToArray();
             string[] arr = new string[arrObj.Length];
 
@@ -230,6 +242,7 @@ namespace ProjectBoost.Controllers {
 
             if(project == null)
                 return NotFound();
+           
             payment.ID = Guid.NewGuid();
             payment.ProjectID = projectID;
             payment.UserID = userID;

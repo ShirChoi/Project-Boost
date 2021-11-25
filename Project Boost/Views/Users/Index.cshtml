@@ -12,7 +12,7 @@
             <th>
                 Имя
             </th>
-            <th>=
+            <th>
                 Публичная история платежей
             </th>
             <th>
@@ -35,9 +35,9 @@
                         @Html.DisplayFor(modelItem => item.Restricted)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> 
-                        | <a asp-action="Details" asp-route-id="@item.ID">Details</a> 
-                        | <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@item.ID">Редактировать</a> 
+                        | <a asp-action="Details" asp-route-id="@item.ID">Данные</a> 
+                        @*| <a asp-action="Delete" asp-route-id="@item.ID">Удалить</a>*@
                     </td>
                 </tr>
             }
@@ -56,7 +56,7 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ID">Редактировать</a>
                     | <a asp-action="Details" asp-route-id="@item.ID">Данные</a>
-                    | @*<a asp-action="Delete" asp-route-id="@item.ID">Удалить</a>*@
+                    @*| <a asp-action="Delete" asp-route-id="@item.ID">Удалить</a>*@
                 </td>
             </tr>
         }
