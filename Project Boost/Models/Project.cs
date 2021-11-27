@@ -13,6 +13,7 @@ namespace ProjectBoost.Models {
         [ForeignKey("User")]
         public Guid UserID { get; set; }
         public string Name { get; set; }
+        [DataType(DataType.MultilineText)]
         public string Description { get; set; }
         public string Demo { get; set; } //TODO поменять со string на File
         public decimal RequiredAmount { get; set; }

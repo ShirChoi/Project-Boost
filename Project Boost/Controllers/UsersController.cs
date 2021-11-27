@@ -142,17 +142,6 @@ namespace ProjectBoost.Controllers {
             if(id != user.ID)
                 return NotFound();
 
-
-
-            //User dbUser = new User() {
-            //    ID = user.ID,
-            //    RoleID = 2,
-            //    Nickname = user.Nickname,
-            //    Password = user.Password,
-            //    Restricted = user.Restricted,
-            //    OpenFinantialHistory = user.OpenFinantialHistory
-            //};
-
             User dbUser = _context.Users.Find(id);
             if(user.Restricted != dbUser.Restricted)
                 dbUser.Restricted = user.Restricted;
@@ -205,6 +194,17 @@ namespace ProjectBoost.Controllers {
 
         [ActionName("Donate")]
         public async Task<IActionResult> Donate(Guid projectID) {
+            var arrObj = Request.RouteValues.ToArray().Select(a => a.Value).ToArray();
+            string[] arr = new string[arrObj.Length];
+
+            for(int i = 0; i < arrObj.Length; i++)
+                arr[i] = (string)arrObj[i];
+
+            bool parsed = Guid.TryParse(arr[2], out projectID); // простите меня за этот код
+            Project project = await _context.Projects.FindAsync(projectID);
+            if(project.Blocked)
+                return RedirectToAction("Index", "Projects");
+
             if(!User.Identity.IsAuthenticated)
                 return RedirectToAction(controllerName: "Projects", actionName: "Index");
             if(User.IsInRole("admin"))
@@ -242,6 +242,9 @@ namespace ProjectBoost.Controllers {
 
             if(project == null)
                 return NotFound();
+
+            if(project.Blocked)
+                return RedirectToAction("Index", "Projects");
            
             payment.ID = Guid.NewGuid();
             payment.ProjectID = projectID;

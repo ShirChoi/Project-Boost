@@ -14,8 +14,8 @@ namespace ProjectBoost.Context {
             string adminRoleName = "admin";
             string userRoleName = "user";
 
-            string adminName = "admin@mail.ru";
-            string adminPassword = "123456";
+            string adminName = "admin";
+            string adminPassword = "password";
 
             // добавляем роли
             Role adminRole = new Role { ID = 1, Name = adminRoleName };
@@ -28,7 +28,8 @@ namespace ProjectBoost.Context {
                 Restricted = false,
                 OpenFinantialHistory = false,
             };
-
+           
+            
             modelBuilder.Entity<Role>().HasData(new Role[] { adminRole, userRole });
             modelBuilder.Entity<User>().HasData(new User[] { adminUser });
             

@@ -42,6 +42,8 @@ namespace ProjectBoost.Controllers {
 
         // GET: Projects/Create
         public async Task<IActionResult> Create() {
+            if(!User.Identity.IsAuthenticated)
+                return RedirectToAction(actionName: "Login", controllerName: "Users");
             Guid userID = Guid.Parse(User.FindFirst(claim => claim.Type == "ID").Value);
             User user = _context.Users.Find(userID);
 
@@ -117,20 +119,23 @@ namespace ProjectBoost.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Description,Demo,RequiredAmount,DeadLine,Blocked")] ProjectEditModel project) {
+        public async Task<IActionResult> Edit(Guid id, [Bind("ID,Description,Demo,RequiredAmount,DeadLine,Blocked")] ProjectEditModel project) {
+            Project dbProject = _context.Projects.Find(id);
+
             if(!ModelState.IsValid)
                 return View(project);
 
             if(!ProjectExists(id))
                 return NotFound();
 
-            Project dbProject = _context.Projects.Find(id);
-
-            dbProject.Blocked           = project.Blocked;
-            dbProject.RequiredAmount    = project.RequiredAmount;
-            dbProject.DeadLine          = project.DeadLine;
-            dbProject.Demo              = project.Demo;
-            dbProject.Description       = project.Description;
+            if(dbProject.Blocked != project.Blocked)
+                dbProject.Blocked           = project.Blocked;
+            else {
+                dbProject.RequiredAmount    = project.RequiredAmount;
+                dbProject.DeadLine          = project.DeadLine;
+                dbProject.Demo              = project.Demo;
+                dbProject.Description       = project.Description;
+            }
 
             if(!await IsAllowedToChange(id.ToString(),
                 User.FindFirst(claim => claim.Type == "ID").Value))
